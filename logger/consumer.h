@@ -12,13 +12,12 @@ template<typename T>
 class Ñonsumer
 {
 public:
+	using stream_type = std::function<std::ostream&(void)>;
+	using filter_type = std::function<bool( const typename T::value_type& )>;
+
 	Ñonsumer( T& container ) :
 		m_container( container )
 	{
-		m_targets.push_back( []() -> std::ostream& 
-		{
-			return std::cout;
-		});
 	}
 
 	void start()
@@ -32,10 +31,24 @@ public:
 		m_worker->join();
 	}
 
-	void addTarget( const std::string& filename )
+	void setPrinterFunction( std::function<void( std::ostream&, const typename T::value_type& )> printer )
+	{
+		m_printer = printer;
+	}
+
+	void attachStreamOutput( std::ostream& output, filter_type filter = nullptr )
+	{
+		m_targets.push_back( std::pair<stream_type, filter_type>( [&]() -> std::ostream&
+			{
+				return output;
+			}, filter ) );
+	}
+
+	void attachFileOutput( const std::string& filename, filter_type filter = nullptr )
 	{
 		auto fileStream = std::make_shared<std::fstream>( filename, std::ios::out );
-		m_targets.push_back( [=]() -> std::ostream& { return fileStream.operator*(); } );
+		stream_type stream = [=]() -> std::ostream& { return fileStream.operator*(); };
+		m_targets.push_back( std::pair<stream_type, filter_type>( [=]() -> std::ostream& { return fileStream.operator*(); }, filter ) );
 	}
 
 private:
@@ -47,8 +60,23 @@ private:
 			auto succeed = m_container.pop( record );
 			if ( succeed )
 			{
-				for ( auto& target : m_targets )
-					target() << record.first << ': ' << record.second << std::endl;
+				if ( m_printer )
+				{
+					for ( auto& target : m_targets )
+					{
+						auto getStreamFunc = target.first;
+						auto filterFunc = target.second;
+						if ( filterFunc )
+						{
+							if ( filterFunc( record ) )
+							    m_printer( getStreamFunc(), record );
+						}
+						else
+						{
+							m_printer( getStreamFunc(), record );
+						}
+					}
+				}
 			}
 		}
 	}
@@ -58,7 +86,7 @@ private:
 	std::unique_ptr<std::thread> m_worker;
 	std::atomic_bool m_stopped = false;
 
-	std::function<void( const typename T::value_type&, std::ostream& )> m_printer;
+	std::function<void( std::ostream&, const typename T::value_type& )> m_printer;
 
-	std::vector<std::function<std::ostream&()>> m_targets;
+	std::vector<std::pair<stream_type, filter_type>> m_targets;
 };

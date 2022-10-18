@@ -10,19 +10,46 @@
 
 #include <windows.h>
 
-struct user_type
+template <typename T>
+struct TestSafeQueue
 {
-	std::string tag;
-	std::chrono::system_clock::time_point time;
+	using value_type = T;
+	void push( const T& value )
+	{
+		data.push( value );
+	}
+
+	void push( T&& value )
+	{
+		data.push( value );
+	}
+
+	template<typename... Args>
+	void emplace( Args&&... args )
+	{
+		data.emplace( std::forward<Args>( args )... );
+	}
+
+	bool pop( T& record )
+	{
+		if ( !data.empty() )
+		{
+			record = std::move( data.front() );
+			data.pop();
+			return true;
+		}
+		return false;
+	}
+
+	bool empty() const
+	{
+		return data.empty();
+	}
+
+private:
+	std::queue<T> data;
 };
 
-template<>
-std::string convert_to_string( user_type& type )
-{
-	std::stringstream buf;
-	buf << type.tag << "time: ";
-	return buf.str();
-}
 
 int main()
 {
@@ -36,14 +63,14 @@ int main()
 	auto pos = exeFullPath.find_last_of('\\');
 	auto folder = exeFullPath.substr( 0, pos );
 
-	logger.addOutput( folder + "\\test.log");
+	logger.addLoggingFile( folder + "\\test.log", Logger::eInfo );
 
 	logger.warn( "info" );
 	logger.error( "info" );
 	logger.info( "info" );
 
 	std::string fmt{"abc{{}} {} bds:{} {}"};
-	std::string res = format( fmt, 10, 16.0f, 'a', "zzz");
+	std::string res = formatter::format( fmt, 16.0f, 'a', "zzz");
 
 	std::thread t1( [&]()
 		{
