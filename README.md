@@ -4,13 +4,13 @@ Assignment for Rightware.
 
 **Install**
 
-- - -
+---
 
-Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or higher.
+Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or hihger.
 
 **Features**
 
-- - -
+---
 
 * Headers only.
 * Several log levels.
@@ -20,7 +20,7 @@ Headers only logger. No installation is required. Copy [logger](https://github.c
 
 **Usage sample**
 
-- - -
+---
 
 Basic usage
 
@@ -73,6 +73,7 @@ int main()
    Logger::info( "Daily log from {}-{}, {}", month, day, dayOfWeek ); 
 }
 ```
+
 <br>
 Logging for custom types
 Objects of custom types may be logged if an operator<< into std::ostream is provided.
@@ -103,50 +104,54 @@ int main()
     Logger::info( "An example of logging custom types. This is MyType object: {}", value );
 }
 ```
+
 <br>
 Logging from multiple threads
 Multuthreaded logging is supported out-of-box. No user action is required.
+<br>
 
-```
 int main()
 {
-    // Start logging.
-    Logger::info( "Start multhreaded logging example" );
-	// Thread one will emit warning logs.
-    std::thread t1( [&]() {
-        for ( int i = 0; i < 100; i++ ) {
+    Logger::info( "Start logging example" );
+
+    // Create three threads which emit messages in parallel
+    std::thread t1([&amp;]() {
+        for ( int i = 0; i < 100; i++ )	{
             Logger::warn( "thread 1" );
             std::this_thread::sleep_for( std::chrono::milliseconds( 30 ) );
-        }
-    });
-	// Thread two will emit error logs.
-	std::thread t2( [&]() {
-        for ( int i = 0; i < 100; i++ ) {
+	}});
+
+    std::thread t2([&amp;]() {
+        for ( int i = 0; i < 100; i++ )	{
             Logger::error( "thread 2" );
-            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
-        }
-    });
-    // Thread two will emit info logs.
-    std::thread t3( [&]() {
-        for ( int i = 0; i < 100; i++ ) {
+	    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+        }});
+
+    std::thread t3([&amp;]() {
+        for ( int i = 0; i < 100; i++ )	{
             Logger::info( "thread 3" );
             std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
-        }
-    });
-
+	}});
+    // Wait for all thread finish.
     t1.join();
     t2.join();
     t3.join();
+
     return 0;
 }
+
 ```
 
 The provided code will print the following into console:
+<br>
+```
+
+    [Info   10/19/22 15:08:01]: thread 3
+    [Warnig 10/19/22 15:08:01]: thread 1
+    [Warnig 10/19/22 15:08:01]: thread 1
+    [Info   10/19/22 15:08:01]: thread 3
+    [Error  10/19/22 15:08:01]: thread 2
 
 ```
-[Info   10/19/22 15:08:01]: thread 3
-[Warnig 10/19/22 15:08:01]: thread 1
-[Warnig 10/19/22 15:08:01]: thread 1
-[Info   10/19/22 15:08:01]: thread 3
-[Error  10/19/22 15:08:01]: thread 2
+
 ```
