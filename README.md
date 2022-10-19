@@ -6,7 +6,7 @@ Assignment for Rightware.
 
 - - -
 
-Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or hihger.
+Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or higher.
 
 **Features**
 
@@ -35,7 +35,7 @@ int main()
     Logger::error( "Something went wrong!" );
 }
 ```
-<br>
+
 Logging into file
 
 ```
@@ -43,8 +43,11 @@ Logging into file
 
 int main()
 {
-    Logger::attachLogFile( "info.log", Logger::LogLevel::eInfo );   // Attaching info.log file to store only information log messages.
-    Logger::attachLogFile( "error.log", Logger::LogLevel::eError ); // Attaching info.log file to store only error log messages.
+    // Attaching info.log file to store only information log messages.
+    Logger::attachLogFile( "info.log", Logger::LogLevel::eInfo );
+    // Attaching info.log file to store only error log messages.
+    Logger::attachLogFile( "error.log", Logger::LogLevel::eError );
+
     // Console will still display all log messages.
 
     Logger::info( "Hello world!" );
@@ -52,7 +55,7 @@ int main()
     Logger::error( "Something went wrong!" ); }
 }
 ```
-<br>
+
 Logging with placeholders
 Logger supports simple formatting. A string message may have {} as placeholder. Replacement for each {} is taken from function parameters.
 
@@ -65,7 +68,8 @@ int main()
     int day = 19;
     std::string dayOfWeek = "Wednesday";
 
-   // This call will output the following message: [Info 10/19/22 14:22:45]: Daily log from October-19, Wednesday
+   // This call will output the following message:
+   // [Info 10/19/22 14:22:45]: Daily log from October-19, Wednesday
    Logger::info( "Daily log from {}-{}, {}", month, day, dayOfWeek ); 
 }
 ```
@@ -102,48 +106,47 @@ int main()
 <br>
 Logging from multiple threads
 Multuthreaded logging is supported out-of-box. No user action is required.
-<br>
-```
-#include "logger.h"
 
+```
 int main()
 {
-    using namespace std::chrono_literals;
-
-    Logger::info( "Start logging example" );
-    // Create three threads which emit messages in parallel
+    // Start logging.
+    Logger::info( "Start multhreaded logging example" );
+	// Thread one will emit warning logs.
     std::thread t1( [&]() {
-        for ( int i = 0; i < 100; i++ )	{
+        for ( int i = 0; i < 100; i++ ) {
             Logger::warn( "thread 1" );
-            std::this_thread::sleep_for( 30ms );
-	}});
-
-    std::thread t2( [&]() {
-        for ( int i = 0; i < 100; i++ )	{
+            std::this_thread::sleep_for( std::chrono::milliseconds( 30 ) );
+        }
+    });
+	// Thread two will emit error logs.
+	std::thread t2( [&]() {
+        for ( int i = 0; i < 100; i++ ) {
             Logger::error( "thread 2" );
-	    std::this_thread::sleep_for( 100ms );
-        }});
-
+            std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+        }
+    });
+    // Thread two will emit info logs.
     std::thread t3( [&]() {
-        for ( int i = 0; i < 100; i++ )	{
+        for ( int i = 0; i < 100; i++ ) {
             Logger::info( "thread 3" );
-            std::this_thread::sleep_for( 50ms );
-	}});
-    // Wait for all thread finish.
+            std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+        }
+    });
+
     t1.join();
     t2.join();
     t3.join();
-
     return 0;
 }
 ```
 
 The provided code will print the following into console:
-<br>
+
 ```
-    [Info   10/19/22 15:08:01]: thread 3
-    [Warnig 10/19/22 15:08:01]: thread 1
-    [Warnig 10/19/22 15:08:01]: thread 1
-    [Info   10/19/22 15:08:01]: thread 3
-    [Error  10/19/22 15:08:01]: thread 2
+[Info   10/19/22 15:08:01]: thread 3
+[Warnig 10/19/22 15:08:01]: thread 1
+[Warnig 10/19/22 15:08:01]: thread 1
+[Info   10/19/22 15:08:01]: thread 3
+[Error  10/19/22 15:08:01]: thread 2
 ```
