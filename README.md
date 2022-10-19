@@ -6,7 +6,7 @@ Assignment for Rightware.
 
 ---
 
-Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or hihger.
+Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or higher.
 
 **Features**
 
@@ -108,6 +108,8 @@ Logging from multiple threads
 Multuthreaded logging is supported out-of-box. No user action is required.
 
 ```
+#include "logger.h"
+
 int main()
 {
     Logger::info( "Start logging example" );
