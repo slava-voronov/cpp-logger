@@ -11,11 +11,11 @@ FetchContent_MakeAvailable(googletest)
 add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
-add_executable(formatter_test "formatter_tests.cpp" "consumer_tests.cpp")
+add_executable(tests "formatter_tests.cpp" "consumer_tests.cpp")
 
-target_link_libraries(formatter_test
+target_link_libraries(tests
  PRIVATE
   GTest::GTest
   Logger)
 
-add_test(formatter_gtest formatter_test)
+add_test(tests tests)

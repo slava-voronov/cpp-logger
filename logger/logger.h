@@ -6,27 +6,40 @@
 #include <ctime>
 
 #include "consumer.h"
+#include "formatter.h"
 #include "safequeue.h"
 
 class Logger
 {
+	Logger();
 	Logger( const Logger& ) = delete;
 	Logger( Logger&& ) = delete;
 public:
-	Logger();
 	~Logger();
 
-	inline void assert( std::string message );
+	inline static Logger& instance()
+	{
+		static Logger s_instance;
+		return s_instance;
+	}
 
-	inline void debug( std::string message );
+	template<typename... Args>
+	inline static void assert( std::string message, Args&&... args );
 
-	inline void error( std::string message );
+	template<typename... Args>
+	inline static void debug( std::string message, Args&&... args );
+
+	template<typename... Args>
+	inline static void error( std::string message, Args&&... args );
 	
-	inline void info( std::string message );
+	template<typename... Args>
+	inline static void info( std::string message, Args&&... args );
 
-	inline void verbose( std::string message );
+	template<typename... Args>
+	inline static void verbose( std::string message, Args&&... args );
 
-	inline void warn( std::string message );
+	template<typename... Args>
+	inline static void warn( std::string message, Args&&... args );
 
 	enum LogLevel
 	{
@@ -38,7 +51,7 @@ public:
 		eWarning = 0x20,
 		eAll = eAssert | eDebug | eError | eInfo | eVerbose | eWarning
 	};
-	inline void attachLogFile( const std::string& filename, Logger::LogLevel filter = Logger::LogLevel::eAll );
+	inline static void attachLogFile( const std::string& filename, unsigned filter = Logger::LogLevel::eAll );
 
 private:
 	using LogMessageFormat = std::tuple<LogLevel, std::chrono::system_clock::time_point, std::string>;
@@ -66,39 +79,51 @@ Logger::~Logger()
 	m_consumer.stop();
 }
 
-inline void Logger::assert( std::string message )
+template<typename... Args>
+inline void Logger::assert( std::string message, Args&&... args )
 {
-	m_messages.emplace( LogLevel::eAssert, std::chrono::system_clock::now(), std::move( message ) );
+	instance().m_messages.emplace( LogLevel::eAssert, std::chrono::system_clock::now(), 
+		formatter::format( message, std::forward<Args>(args)... ) );
 }
 
-inline void Logger::debug( std::string message )
+template<typename... Args>
+inline void Logger::debug( std::string message, Args&&... args )
 {
-	m_messages.emplace( LogLevel::eDebug, std::chrono::system_clock::now(), std::move( message ) );
+	instance().m_messages.emplace( LogLevel::eDebug, std::chrono::system_clock::now(),
+		formatter::format( message, std::forward<Args>( args )... ) );
 }
 
-inline void Logger::error( std::string message )
+template<typename... Args>
+inline void Logger::error( std::string message, Args&&... args )
 {
-	m_messages.emplace( LogLevel::eError, std::chrono::system_clock::now(), std::move( message ) );
+	instance().m_messages.emplace( LogLevel::eError, std::chrono::system_clock::now(),
+		formatter::format( message, std::forward<Args>( args )... ) );
 }
 
-inline void Logger::info( std::string message )
+template<typename... Args>
+inline void Logger::info( std::string message, Args&&... args )
 {
-	m_messages.emplace( LogLevel::eInfo, std::chrono::system_clock::now(), std::move( message ) );
+	instance().m_messages.emplace( LogLevel::eInfo, std::chrono::system_clock::now(),
+		formatter::format( message, std::forward<Args>( args )... ) );
 }
 
-inline void Logger::verbose( std::string message )
+template<typename... Args>
+inline void Logger::verbose( std::string message, Args&&... args )
 {
-	m_messages.emplace( LogLevel::eVerbose, std::chrono::system_clock::now(), std::move( message ) );
+	instance().m_messages.emplace( LogLevel::eVerbose, std::chrono::system_clock::now(),
+		formatter::format( message, std::forward<Args>( args )... ) );
 }
 
-void Logger::warn( std::string message )
+template<typename... Args>
+void Logger::warn( std::string message, Args&&... args )
 {
-	m_messages.emplace( LogLevel::eWarning, std::chrono::system_clock::now(), std::move( message ) );
+	instance().m_messages.emplace( LogLevel::eWarning, std::chrono::system_clock::now(),
+		formatter::format( message, std::forward<Args>( args )... ) );
 }
 
-void Logger::attachLogFile( const std::string& filename, Logger::LogLevel filter = Logger::LogLevel::eAll )
+void Logger::attachLogFile( const std::string& filename, unsigned filter )
 {
-	m_consumer.attachFileOutput( filename, [=]( const LogMessageFormat& logMessage ) -> bool
+	instance().m_consumer.attachFileOutput( filename, [=]( const LogMessageFormat& logMessage ) -> bool
 		{
 			Logger::LogLevel level = std::get<0>( logMessage );
 			return (filter & level) != 0;

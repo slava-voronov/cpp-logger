@@ -38,6 +38,13 @@ TEST( FormatterTests, TestCustomTypes )
 	ASSERT_EQ( expected, actual );
 }
 
+TEST( FormatterTests, TestWrongArgumentsNumber )
+{
+	std::string expected = "Some string with placeholders 1 2 {}";
+	std::string actual = formatter::format( "Some string with placeholders {} {} {}", 1, 2 );
+	ASSERT_EQ( expected, actual );
+}
+
 int main( int argc, char** argv )
 {
 	::testing::InitGoogleTest( &argc, argv );

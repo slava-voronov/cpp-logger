@@ -43,6 +43,11 @@ namespace formatter
 		return fmt;
 	}
 
+	std::string format( std::string fmt )
+	{
+		return std::move( fmt );
+	}
+
 	template <typename... Args>
 	std::string format( std::string fmt, Args&&... args )
 	{

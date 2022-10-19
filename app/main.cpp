@@ -1,100 +1,58 @@
 #include <string>
-#include <iostream>
 #include <chrono>
-#include <memory>
-#include <algorithm>
-#include <sstream>
 
 #include "logger.h"
-#include "formatter.h"
 
-#include <windows.h>
-
-template <typename T>
-struct TestSafeQueue
-{
-	using value_type = T;
-	void push( const T& value )
-	{
-		data.push( value );
-	}
-
-	void push( T&& value )
-	{
-		data.push( value );
-	}
-
-	template<typename... Args>
-	void emplace( Args&&... args )
-	{
-		data.emplace( std::forward<Args>( args )... );
-	}
-
-	bool pop( T& record )
-	{
-		if ( !data.empty() )
-		{
-			record = std::move( data.front() );
-			data.pop();
-			return true;
-		}
-		return false;
-	}
-
-	bool empty() const
-	{
-		return data.empty();
-	}
-
-private:
-	std::queue<T> data;
-};
-
+// The sample supports file logginf only on Windows platforms. As std library does not provide operations on paths in C++11.
+#ifdef _WINDOWS
+    #include <windows.h>
+#endif
 
 int main()
 {
 	using namespace std::chrono_literals;
 
-	Logger logger;
-
+#ifdef _WINDOWS
 	char buffer[MAX_PATH];
 	DWORD length = GetModuleFileNameA( NULL, buffer, MAX_PATH );
 	std::string exeFullPath( buffer );
-	auto pos = exeFullPath.find_last_of('\\');
+	auto pos = exeFullPath.find_last_of( '\\' );
 	auto folder = exeFullPath.substr( 0, pos );
 
-	logger.addLoggingFile( folder + "\\test.log", Logger::eInfo );
+	// Attach log file. Enable only info and warning messages. Messages with other log levels will be filtered out.
+	// File is created in the folder with executable.
+	Logger::attachLogFile( folder + "\\test.log", Logger::LogLevel::eInfo | Logger::LogLevel::eWarning );
+#endif // _WINDOWS
 
-	logger.warn( "info" );
-	logger.error( "info" );
-	logger.info( "info" );
+	// Start logging.
+	Logger::info( "Start logging example" );
 
-	std::string fmt{"abc{{}} {} bds:{} {}"};
-	std::string res = formatter::format( fmt, 16.0f, 'a', "zzz");
-
+	// Thread one will emit warning logs.
 	std::thread t1( [&]()
 		{
 			for ( int i = 0; i < 100; i++ )
 			{
-				logger.warn( "t1" );
+				Logger::warn( "thread 1" );
 				std::this_thread::sleep_for( 30ms );
 			}
 		} );
 
+	// Thread two will emit error logs.
 	std::thread t2( [&]()
 		{
 			for ( int i = 0; i < 100; i++ )
 			{
-				logger.error( "t2" );
+				Logger::error( "thread 2" );
 				std::this_thread::sleep_for( 100ms );
 			}
 		} );
 
+	// Thread two will emit info logs.
 	std::thread t3( [&]()
 		{
 			for ( int i = 0; i < 100; i++ )
 			{
-				logger.info( "t3" );
+				Logger::info( "thread 3" );
 				std::this_thread::sleep_for( 50ms );
 			}
 		} );
