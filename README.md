@@ -6,7 +6,7 @@ Assignment for Rightware.
 
 ---
 
-Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or hihger.
+Headers only logger. No installation is required. Copy [logger](https://github.com/slava-voronov/cpp-logger/tree/main/logger) folder to your build tree and use a C++11 compiler or higher.
 
 **Features**
 
@@ -74,7 +74,6 @@ int main()
 }
 ```
 
-<br>
 Logging for custom types
 Objects of custom types may be logged if an operator<< into std::ostream is provided.
 
@@ -105,10 +104,11 @@ int main()
 }
 ```
 
-<br>
 Logging from multiple threads
 Multuthreaded logging is supported out-of-box. No user action is required.
-<br>
+
+```
+#include "logger.h"
 
 int main()
 {
@@ -139,11 +139,10 @@ int main()
 
     return 0;
 }
-
 ```
 
 The provided code will print the following into console:
-<br>
+
 ```
 
     [Info   10/19/22 15:08:01]: thread 3
@@ -151,7 +150,4 @@ The provided code will print the following into console:
     [Warnig 10/19/22 15:08:01]: thread 1
     [Info   10/19/22 15:08:01]: thread 3
     [Error  10/19/22 15:08:01]: thread 2
-
-```
-
 ```
