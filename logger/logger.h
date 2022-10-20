@@ -15,27 +15,34 @@ class Logger
 public:
     ~Logger();
 
+    // Returns Logger instance.
     inline static Logger& instance()
     {
         static Logger s_instance;
         return s_instance;
     }
 
+    // Logs assertion message.
     template<typename... Args>
     inline static void log_assert( std::string message, Args&&... args );
 
+    // Logs debug message.
     template<typename... Args>
     inline static void debug( std::string message, Args&&... args );
 
+    // Logs error message.
     template<typename... Args>
     inline static void error( std::string message, Args&&... args );
     
+    // Logs information message.
     template<typename... Args>
     inline static void info( std::string message, Args&&... args );
 
+    // Logs verbose message.
     template<typename... Args>
     inline static void verbose( std::string message, Args&&... args );
 
+    // Logs warning message.
     template<typename... Args>
     inline static void warn( std::string message, Args&&... args );
 
