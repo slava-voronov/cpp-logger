@@ -12,13 +12,13 @@ public:
     void push( const T& value )
     {
         std::lock_guard<std::mutex> lock( m_mutex );
-        m_queue.push_back( value );
+        m_queue.push( value );
     }
 
     void push( T&& value )
     {
         std::lock_guard<std::mutex> lock( m_mutex );
-        m_queue.push_back( value );
+        m_queue.push( value );
     }
 
     template<typename... Args>

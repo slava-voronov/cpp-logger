@@ -11,7 +11,7 @@ FetchContent_MakeAvailable(googletest)
 add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
-add_executable(tests "formatter_tests.cpp" "consumer_tests.cpp")
+add_executable(tests "formatter_tests.cpp" "consumer_tests.cpp" "safequeue_tests.cpp")
 
 target_link_libraries(tests
  PRIVATE
