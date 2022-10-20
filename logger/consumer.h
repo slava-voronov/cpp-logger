@@ -9,20 +9,20 @@
 #include <functional>
 
 template<typename T>
-class Ñonsumer
+class Consumer
 {
 public:
 	using stream_type = std::function<std::ostream&(void)>;
 	using filter_type = std::function<bool( const typename T::value_type& )>;
 
-	Ñonsumer( T& container ) :
-		m_container( container )
+	Consumer( T& container ) :
+		m_container( container ), m_stopped( false )
 	{
 	}
 
 	void start()
 	{
-		m_worker.reset( new std::thread( &Ñonsumer<T>::run, this ) );
+		m_worker.reset( new std::thread( &Consumer<T>::run, this ) );
 	}
 
 	void stop()
@@ -56,7 +56,7 @@ private:
 	{
 		while ( !m_stopped || !m_container.empty() )
 		{
-			T::value_type record;
+			typename T::value_type record;
 			auto succeed = m_container.pop( record );
 			if ( succeed )
 			{
@@ -84,7 +84,7 @@ private:
 private:
 	T& m_container;
 	std::unique_ptr<std::thread> m_worker;
-	std::atomic_bool m_stopped = false;
+	std::atomic_bool m_stopped;
 
 	std::function<void( std::ostream&, const typename T::value_type& )> m_printer;
 

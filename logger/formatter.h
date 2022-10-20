@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <type_traits>
+#include <sstream>
 
 namespace formatter
 {
@@ -13,7 +14,7 @@ namespace formatter
 		return buf.str();
 	}
 
-	auto findNextPlaceHolder( std::string& fmt )
+	std::string::iterator findNextPlaceHolder( std::string& fmt )
 	{
 		return std::adjacent_find( fmt.begin(), fmt.end(), []( char l, char r ) -> bool
 			{

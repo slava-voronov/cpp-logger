@@ -10,8 +10,6 @@
 
 int main()
 {
-	using namespace std::chrono_literals;
-
 #ifdef _WINDOWS
 	char buffer[MAX_PATH];
 	DWORD length = GetModuleFileNameA( NULL, buffer, MAX_PATH );
@@ -33,7 +31,7 @@ int main()
 			for ( int i = 0; i < 100; i++ )
 			{
 				Logger::warn( "thread 1" );
-				std::this_thread::sleep_for( 30ms );
+				std::this_thread::sleep_for( std::chrono::milliseconds( 30 ) );
 			}
 		} );
 
@@ -43,7 +41,7 @@ int main()
 			for ( int i = 0; i < 100; i++ )
 			{
 				Logger::error( "thread 2" );
-				std::this_thread::sleep_for( 100ms );
+				std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 			}
 		} );
 
@@ -53,7 +51,7 @@ int main()
 			for ( int i = 0; i < 100; i++ )
 			{
 				Logger::info( "thread 3" );
-				std::this_thread::sleep_for( 50ms );
+				std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 			}
 		} );
 

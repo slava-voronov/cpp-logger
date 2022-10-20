@@ -9,6 +9,8 @@
 #include "formatter.h"
 #include "safequeue.h"
 
+#undef assert
+
 class Logger
 {
 	Logger();
@@ -63,7 +65,7 @@ private:
 
 private:
 	Container m_messages;
-	Ñonsumer<Container> m_consumer;
+	Consumer<Container> m_consumer;
 };
 
 Logger::Logger(): m_consumer( m_messages )

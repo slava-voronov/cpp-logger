@@ -51,7 +51,7 @@ TEST( ConsumerTests, TestStringOutput )
 	container.push( std::make_pair( 2, "2" ) );
 	container.push( std::make_pair( 3, "3" ) );
 
-	Ñonsumer<TestSafeQueue<std::pair<int, std::string>>> worker( container );
+	Consumer<TestSafeQueue<std::pair<int, std::string>>> worker( container );
 
 	std::stringstream output;
 	worker.attachStreamOutput( output );
@@ -80,7 +80,7 @@ TEST( ConsumerTests, TestFilteredOutput )
 	container.push( std::make_pair( 5, "5" ) );
 	container.push( std::make_pair( 6, "6" ) );
 
-	Ñonsumer<TestSafeQueue<std::pair<int, std::string>>> worker( container );
+	Consumer<TestSafeQueue<std::pair<int, std::string>>> worker( container );
 
 	worker.setPrinterFunction( []( std::ostream& output, const std::pair<int, std::string>& record )
 		{

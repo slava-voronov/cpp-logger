@@ -7,7 +7,7 @@ template<typename T>
 class SafeQueue
 {
 public:
-	using value_type = typename T;
+	using value_type = T;
 	void push( const T& value )
 	{
 		std::lock_guard<std::mutex> lock( m_mutex );
